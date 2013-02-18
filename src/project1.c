@@ -42,16 +42,14 @@ int main(int argc, char *argv[]) {
 
   /* mess with the image here  */
   for(i=0; i<imagesize; i++) {
-
     if (image[i].b > (threshold * image[i].r) && image[i].b > (threshold * image[i].g))
     {
-
+      image[i] = background[i];
     }
-
   }
 
   /* write out the resulting image */
-  writePPM(image, rows, cols, colors /* s/b 255 */, argv[2]);
+  writePPM(image, rows, cols, colors /* s/b 255 */, argv[3]);
 
   /* free the image memory */
 #if USECPP
