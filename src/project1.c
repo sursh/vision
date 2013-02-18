@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   imagesize = (long)rows * (long)cols;
 
   /* mess with the image here  */
-  for(i=0; i<imagesize; i++) {
+  for(i=0; i<(20*cols); i++) {
 
     if ((i % cols) < 20) {
       image[i].r = image[i].g = 255;
