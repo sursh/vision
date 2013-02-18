@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   Pixel *background;
   int rows, cols, colors;
   int bgrows, bgcols, bgcolors;
-  long imagesize;
+  long imagesize, bgimagesize;
   long i, j;
   int x, y;
   float threshold = 1.5; /* ratio of blue:red || blue:green */
@@ -40,6 +40,12 @@ int main(int argc, char *argv[]) {
 
   /* calculate the image size */
   imagesize = (long)rows * (long)cols;
+  bgimagesize = (long)bgrows * (long)cols;
+
+  if (imagesize > bgimagesize){
+    fprintf(stderr, "%s is bigger than %s.\n", argv[1], argv[2]);
+    exit(-1);
+  }
 
   /* mess with the image here  */
   for(i=0; i<imagesize; i++) {
