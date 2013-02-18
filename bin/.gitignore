@@ -1,3 +1,4 @@
 processed.ppm
 project1
 *.o
+.DS_Store

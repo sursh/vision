@@ -14,6 +14,7 @@ int main(int argc, char *argv[]) {
   int rows, cols, colors;
   long imagesize;
   long i;
+  float threshold = 1.5;
 
   if(argc < 3) {
     printf("Usage: ppmtest <input file> <output file>\n");
@@ -31,11 +32,12 @@ int main(int argc, char *argv[]) {
   imagesize = (long)rows * (long)cols;
 
   /* mess with the image here  */
-  for(i=0; i<(20*cols); i++) {
+  for(i=0; i<imagesize; i++) {
 
-    if ((i % cols) < 20) {
-      image[i].r = image[i].g = 255;
-      image[i].b = 0;
+    if (image[i].b > (threshold * image[i].r) && image[i].b > (threshold * image[i].g))
+    {
+      image[i].r = image[i].b = 0; 
+      image[i].g = 255;
     }
 
   }
