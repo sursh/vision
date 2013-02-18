@@ -15,8 +15,9 @@ int main(int argc, char *argv[]) {
   int rows, cols, colors;
   int bgrows, bgcols, bgcolors;
   long imagesize;
-  long i;
-  float threshold = 1.5;
+  long i, j;
+  int x, y;
+  float threshold = 1.5; /* ratio of blue:red || blue:green */
 
   if(argc < 4) {
     printf("Usage: ppmtest <input file> <background file> <output file>\n");
@@ -42,9 +43,16 @@ int main(int argc, char *argv[]) {
 
   /* mess with the image here  */
   for(i=0; i<imagesize; i++) {
+    /* if blue */
     if (image[i].b > (threshold * image[i].r) && image[i].b > (threshold * image[i].g))
     {
-      image[i] = background[i];
+      /* convert to (x,y) coordinates */
+      x = i % cols;
+      y = i / cols;
+
+      /* convert to j, which is like i but for the background image */
+      j = (y * bgcols) + x;
+      image[i] = background[j];
     }
   }
 
