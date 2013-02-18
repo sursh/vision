@@ -11,13 +11,15 @@
 
 int main(int argc, char *argv[]) {
   Pixel *image;
+  Pixel *background;
   int rows, cols, colors;
+  int bgrows, bgcols, bgcolors;
   long imagesize;
   long i;
   float threshold = 1.5;
 
-  if(argc < 3) {
-    printf("Usage: ppmtest <input file> <output file>\n");
+  if(argc < 4) {
+    printf("Usage: ppmtest <input file> <background file> <output file>\n");
     exit(-1);
   }
 
@@ -25,6 +27,13 @@ int main(int argc, char *argv[]) {
   image = readPPM(&rows, &cols, &colors, argv[1]);
   if(!image) {
     fprintf(stderr, "Unable to read %s\n", argv[1]);
+    exit(-1);
+  }
+
+  /* read in the background image */
+  background = readPPM(&bgrows, &bgcols, &bgcolors, argv[2]);
+  if(!background) {
+    fprintf(stderr, "Unable to read %s\n", argv[2]);
     exit(-1);
   }
 
@@ -36,8 +45,7 @@ int main(int argc, char *argv[]) {
 
     if (image[i].b > (threshold * image[i].r) && image[i].b > (threshold * image[i].g))
     {
-      image[i].r = image[i].b = 0; 
-      image[i].g = 255;
+
     }
 
   }
