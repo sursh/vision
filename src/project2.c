@@ -16,6 +16,8 @@ int main(int argc, char *argv[]) {
   long imagesize;
   long i;
   int gain = atoi(argv[3]);
+  unsigned char *mask = NULL;
+  int intensities = 255;
 
   if(argc < 4) {
     printf("Usage: ./project2 <input file> <output file> <threshold>\n");
@@ -29,26 +31,27 @@ int main(int argc, char *argv[]) {
     exit(-1);
   }
 
+  printf("%d %d %d %ld\n", rows, cols, rows*cols, (long)rows * (long)cols );
+
   /* calculate the image size */
   imagesize = (long)rows * (long)cols;
 
+  mask = (unsigned char*)malloc(sizeof(unsigned char) * imagesize);
+
   /* mess with the image here   */
   for(i=0; i<imagesize; i++) {
+
     if (image[i].r > (gain * image[i].g)) {
-      image[i].r = 255;
-      image[i].g = 0;
-      image[i].b = 0;
+      mask[i] = 255;
     }
+
     else {
-      image[i].r = 0;
-      image[i].b = 0;
-      image[i].g = 0;
+      mask[i] = 0;
     }
   } 
 
-  
   /* write out the resulting image */
-  writePPM(image, rows, cols, colors /* s/b 255 */, argv[2]);
+  writePGM(mask, rows, cols, intensities /* s/b 255 */, argv[2]);
 
   /* free the image memory */
 #if USECPP

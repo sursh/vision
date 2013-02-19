@@ -9,7 +9,7 @@ CC = gcc
 INCDIR =../include
 
 # set the flags for the C and C++ compiler to give lots of warnings
-CFLAGS = -I$(INCDIR) -O2 -Wall -Wstrict-prototypes -Wnested-externs -Wmissing-prototypes -Wmissing-declarations
+CFLAGS = -I$(INCDIR) -O2 -Wall -ggdb -Wstrict-prototypes -Wnested-externs -Wmissing-prototypes -Wmissing-declarations
 CPPFLAGS = $(CFLAGS)
 
 # path to the object file directory
