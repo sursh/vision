@@ -32,7 +32,7 @@ _DEPS = ppmIO.h
 DEPS = $(patsubst %,$(INCDIR)/%,$(_DEPS))
 
 # put a list of the executables here
-EXECUTABLES = tifftest ppmtest project1
+EXECUTABLES = tifftest ppmtest project1 project2
 
 # put a list of all the object files here for all executables (with .o endings)
 _OBJ = tiffmain.o ppmmain.o
@@ -64,6 +64,9 @@ ppmtest: $(ODIR)/ppmmain.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 project1: $(ODIR)/project1.o
+	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
+
+project2: $(ODIR)/project2.o
 	$(CC) -o $(BINDIR)/$@ $^ $(LFLAGS) $(LIBS)
 
 .PHONY: clean
