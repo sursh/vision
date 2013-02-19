@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ppmIO.h"
+#include "vision.h"
 
 #define USECPP 0
 
@@ -14,9 +15,10 @@ int main(int argc, char *argv[]) {
   int rows, cols, colors;
   long imagesize;
   long i;
+  int gain = atoi(argv[3]);
 
-  if(argc < 3) {
-    printf("Usage: ./project2 <input file> <output file>\n");
+  if(argc < 4) {
+    printf("Usage: ./project2 <input file> <output file> <threshold>\n");
     exit(-1);
   }
 
@@ -32,7 +34,16 @@ int main(int argc, char *argv[]) {
 
   /* mess with the image here   */
   for(i=0; i<imagesize; i++) {
-    //printf("%ld\n", i);
+    if (image[i].r > (gain * image[i].g)) {
+      image[i].r = 255;
+      image[i].g = 0;
+      image[i].b = 0;
+    }
+    else {
+      image[i].r = 0;
+      image[i].b = 0;
+      image[i].g = 0;
+    }
   } 
 
   
