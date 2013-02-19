@@ -11,16 +11,12 @@
 
 int main(int argc, char *argv[]) {
   Pixel *image;
-  Pixel *background;
   int rows, cols, colors;
-  int bgrows, bgcols, bgcolors;
-  long imagesize, bgimagesize;
-  long i, j;
-  int x, y;
-  float threshold = 1.5; /* ratio of blue:red || blue:green */
+  long imagesize;
+  long i;
 
-  if(argc < 4) {
-    printf("Usage: ppmtest <input file> <background file> <output file>\n");
+  if(argc < 3) {
+    printf("Usage: ./project2 <input file> <output file>\n");
     exit(-1);
   }
 
@@ -31,39 +27,17 @@ int main(int argc, char *argv[]) {
     exit(-1);
   }
 
-  /* read in the background image */
-  background = readPPM(&bgrows, &bgcols, &bgcolors, argv[2]);
-  if(!background) {
-    fprintf(stderr, "Unable to read %s\n", argv[2]);
-    exit(-1);
-  }
-
   /* calculate the image size */
   imagesize = (long)rows * (long)cols;
-  bgimagesize = (long)bgrows * (long)cols;
 
-  if (imagesize > bgimagesize){
-    fprintf(stderr, "%s is bigger than %s.\n", argv[1], argv[2]);
-    exit(-1);
-  }
-
-  /* mess with the image here  */
+  /* mess with the image here   */
   for(i=0; i<imagesize; i++) {
-    /* if blue */
-    if (image[i].b > (threshold * image[i].r) && image[i].b > (threshold * image[i].g))
-    {
-      /* convert to (x,y) coordinates */
-      x = i % cols;
-      y = i / cols;
+    //printf("%ld\n", i);
+  } 
 
-      /* convert to j, which is like i but for the background image */
-      j = (y * bgcols) + x;
-      image[i] = background[j];
-    }
-  }
-
+  
   /* write out the resulting image */
-  writePPM(image, rows, cols, colors /* s/b 255 */, argv[3]);
+  writePPM(image, rows, cols, colors /* s/b 255 */, argv[2]);
 
   /* free the image memory */
 #if USECPP
