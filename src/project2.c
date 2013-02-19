@@ -9,56 +9,78 @@
 #include "vision.h"
 
 #define USECPP 0
+#define intensities 255
+
+void grow(unsigned char *image, int rows, int cols);
 
 int main(int argc, char *argv[]) {
   Pixel *image;
   int rows, cols, colors;
   long imagesize;
   long i;
-  int gain = atoi(argv[3]);
+  int gain;
   unsigned char *mask = NULL;
-  int intensities = 255;
+  unsigned char *grown = NULL;
+  char *inputfile;
+  char *maskfile;
+  char *processedfile;
 
   if(argc < 4) {
-    printf("Usage: ./project2 <input file> <output file> <threshold>\n");
+    printf("Usage: ./project2 <input file> <mask file> <altered file> <gain>\n");
     exit(-1);
   }
+
+  inputfile = argv[1];
+  maskfile = argv[2];
+  processedfile = argv[3];
+  gain = atoi(argv[4]);
 
   /* read in the image */
-  image = readPPM(&rows, &cols, &colors, argv[1]);
+  image = readPPM(&rows, &cols, &colors, inputfile);
   if(!image) {
-    fprintf(stderr, "Unable to read %s\n", argv[1]);
+    fprintf(stderr, "Unable to read %s\n", inputfile);
     exit(-1);
   }
-
-  printf("%d %d %d %ld\n", rows, cols, rows*cols, (long)rows * (long)cols );
 
   /* calculate the image size */
   imagesize = (long)rows * (long)cols;
-
   mask = (unsigned char*)malloc(sizeof(unsigned char) * imagesize);
+  grown = (unsigned char*)malloc(sizeof(unsigned char) * imagesize);
 
   /* mess with the image here   */
   for(i=0; i<imagesize; i++) {
-
     if (image[i].r > (gain * image[i].g)) {
       mask[i] = 255;
     }
-
     else {
       mask[i] = 0;
     }
   } 
 
+  // memcopy into grown from mask
+
   /* write out the resulting image */
-  writePGM(mask, rows, cols, intensities /* s/b 255 */, argv[2]);
+  writePGM(mask, rows, cols, intensities, maskfile);
+  writePGM(image, rows, cols, intensities, outputfile);
+
+  grow(grown, rows, cols, );
 
   /* free the image memory */
-#if USECPP
-  delete[] image;
-#else
   free(image);
-#endif
+  free(mask);
+  free(grown);
 
   return(0);
+}
+
+void grow(unsigned char *image, int rows, int cols) {
+
+  long imagesize, i;
+  imagesize = (long)rows * (long)cols;
+
+  /* arbitrary image manipulation for testing */
+  for (i=0; i < imagesize; ++i){
+    if (grown.[i] == 255) grown.[i] = 128;
+  }
+  
 }
