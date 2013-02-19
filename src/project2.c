@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "ppmIO.h"
 #include "vision.h"
 
@@ -57,13 +58,15 @@ int main(int argc, char *argv[]) {
     }
   } 
 
-  // memcopy into grown from mask
+  /* make a copy of mask */
+  memcpy(grown, mask, imagesize);
 
-  /* write out the resulting image */
+  /* write out the mask */
   writePGM(mask, rows, cols, intensities, maskfile);
-  writePGM(image, rows, cols, intensities, outputfile);
 
-  grow(grown, rows, cols, );
+  /* grow the regions and print out resulting file */
+  grow(grown, rows, cols);
+  writePGM(grown, rows, cols, intensities, processedfile);
 
   /* free the image memory */
   free(image);
@@ -80,7 +83,7 @@ void grow(unsigned char *image, int rows, int cols) {
 
   /* arbitrary image manipulation for testing */
   for (i=0; i < imagesize; ++i){
-    if (grown.[i] == 255) grown.[i] = 128;
+    if (image[i] == 255) image[i] = 128;
   }
   
 }
