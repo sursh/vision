@@ -11,6 +11,8 @@
 
 #define USECPP 0
 #define intensities 255
+#define FOREGROUND 255
+#define BACKGROUND 0
 
 void grow(unsigned char *mask, unsigned char *grown, int rows, int cols);
 
@@ -52,10 +54,10 @@ int main(int argc, char *argv[]) {
   /* mess with the image here   */
   for(i=0; i<imagesize; i++) {
     if (image[i].r > (gain * image[i].g)) {
-      mask[i] = 255;
+      mask[i] = BACKGROUND;
     }
     else {
-      mask[i] = 0;
+      mask[i] = FOREGROUND;
     }
   } 
 
@@ -84,6 +86,7 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
   int x, y, j, k;
 
   imagesize = (long)rows * (long)cols;
+  printf("%d\n", cols);
 
   for (i=0; i < imagesize; ++i){
 
@@ -92,14 +95,29 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
       grown[i] = mask[i];
     } 
     /* ignore if foreground */
-    else if (mask[i] == 0) {
+    else if (mask[i] == FOREGROUND) {
       grown[i] = mask[i];
     }
     /* if background, apply growing algorithm */
-    else if (mask[i] == 255) {
+    else if (mask[i] == BACKGROUND) {
       x = i % cols;
       y = i / cols;
-    }
+
+      /* look at 8 nearest neighbors. If foreground, make i foreground too */
+      for (j = -1; j <= 1; ++j) {
+        for(k = -1; k <= 1; ++k) {
+          /* grab pixel at ((x+j), (y+k)) */
+          if (i<2000) printf("i %ld, (%d, %d), j %d\n", i, j, k, ((cols*(y+k)) + (x+j)) );
+          if (mask[ (cols*(y+k)) + (x+j) ] == FOREGROUND) {
+            grown[i] = FOREGROUND;
+          }
+          else {
+            grown[i] = 128;
+          }
+        }
+      }
+    }  
+    
     else {
       grown[i] = mask[i];
     }
