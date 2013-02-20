@@ -12,7 +12,7 @@
 #define USECPP 0
 #define intensities 255
 
-void grow(unsigned char *mask, unsigned char *newimage, int rows, int cols);
+void grow(unsigned char *mask, unsigned char *grown, int rows, int cols);
 
 int main(int argc, char *argv[]) {
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   } 
 
   /* make copies of mask to use in image implementation */
-  memcpy(grown, mask, imagesize);
+  //memcpy(grown, mask, imagesize);
 
   /* manipulate the images */
   grow(mask, grown, rows, cols);
@@ -84,9 +84,25 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
   int x, y, j, k;
 
   imagesize = (long)rows * (long)cols;
-  
+
   for (i=0; i < imagesize; ++i){
-    if (mask[i] == 0) grown[i] = 128;
+
+    /* don't process the 1 pixel layer around the whole image */
+    if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) {
+      grown[i] = mask[i];
+    } 
+    /* ignore if foreground */
+    else if (mask[i] == 0) {
+      grown[i] = mask[i];
+    }
+    /* if background, apply growing algorithm */
+    else if (mask[i] == 255) {
+      x = i % cols;
+      y = i / cols;
+    }
+    else {
+      grown[i] = mask[i];
+    }
   }
   
 }
