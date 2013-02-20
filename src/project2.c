@@ -96,47 +96,44 @@ int main(int argc, char *argv[]) {
 void medianify(unsigned char *mask, unsigned char *median, int rows, int cols) {
 
   long imagesize, i, neighbor;
-  int x, y, j, k;
+  int x, y, j, k, total;
 
   imagesize = (long)rows * (long)cols;
 
-  for (i=0; i < imagesize; ++i){
+  for (i=0; i < imagesize; ++i){ /* for each pixel */
 
     /* don't process the 1 pixel layer around the whole image */
     if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) {
       median[i] = mask[i];
     } 
-    /* ignore if background */
-    else if (mask[i] == BACKGROUND) {
-      median[i] = 0;
-    }
-    /* if foreground, apply algorithm */
-    else if (mask[i] == FOREGROUND) {
+    
+    else {
+
       x = i % cols;
       y = i / cols;
 
-      /* look at 8 nearest neighbors. If any are background, turn pixel off */
+      total = 0;
+
+      /* look at 8 nearest neighbors. Average wins, i is tiebreaker */
       for (j = -1; j <= 1; ++j) {
         for(k = -1; k <= 1; ++k) {
 
           neighbor = ( (x+j) + (cols*(y+k)) );
 
-          if (mask[neighbor] == BACKGROUND) {
-            median[i] = BACKGROUND;
-            break; /* out of first loop */
-          }
-          else {
-            median[i] = FOREGROUND;
+          if (mask[neighbor] == FOREGROUND) {
+            ++total;
           }
           
+          if (total > 4) {
+            median[i] = FOREGROUND;
+          }
+          else {
+            median[i] = BACKGROUND;
+          }
+
         }
-        if (median[i] == BACKGROUND) break; /* out of second loop */
       }
     }  
-    
-    else {
-      median[i] = mask[i];
-    }
   }
 }
 
