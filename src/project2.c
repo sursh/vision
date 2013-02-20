@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   char *maskfile;
   char *processedfile;
 
-  if(argc < 4) {
+  if(argc < 5) {
     printf("Usage: ./project2 <input file> <mask file> <altered file> <gain>\n");
     exit(-1);
   }
@@ -58,14 +58,14 @@ int main(int argc, char *argv[]) {
     }
   } 
 
-  /* make a copy of mask */
+  /* make copies of mask to use in image implementation */
   memcpy(grown, mask, imagesize);
 
-  /* write out the mask */
-  writePGM(mask, rows, cols, intensities, maskfile);
-
-  /* grow the regions and print out resulting file */
+  /* manipulate the images */
   grow(grown, rows, cols);
+
+  /* write out the files */
+  writePGM(mask, rows, cols, intensities, maskfile);
   writePGM(grown, rows, cols, intensities, processedfile);
 
   /* free the image memory */
