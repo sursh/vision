@@ -84,6 +84,55 @@ int main(int argc, char *argv[]) {
   return(0);
 }
 
+/* turn off any foreground pixel with a background pixel neighbor (8-connected) */
+void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
+
+  long imagesize, i, neighbor;
+  int x, y, j, k;
+
+  imagesize = (long)rows * (long)cols;
+
+  for (i=0; i < imagesize; ++i){
+
+    /* don't process the 1 pixel layer around the whole image */
+    if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) {
+      shrunk[i] = mask[i];
+    } 
+    /* ignore if background */
+    else if (mask[i] == BACKGROUND) {
+      shrunk[i] = 0;
+    }
+    /* if foreground, apply shrinking algorithm */
+    else if (mask[i] == FOREGROUND) {
+      x = i % cols;
+      y = i / cols;
+
+      /* look at 8 nearest neighbors. If any are background, turn pixel off */
+      for (j = -1; j <= 1; ++j) {
+        for(k = -1; k <= 1; ++k) {
+
+          neighbor = ( (x+j) + (cols*(y+k)) );
+
+          if (mask[neighbor] == BACKGROUND) {
+            shrunk[i] = BACKGROUND;
+            break; /* out of first loop */
+          }
+          else {
+            shrunk[i] = FOREGROUND;
+          }
+          
+        }
+        if (shrunk[i] == BACKGROUND) break; /* out of second loop */
+      }
+    }  
+    
+    else {
+      shrunk[i] = mask[i];
+      printf("%s\n", "fuck");
+    }
+  }
+}
+
 /* turn on any background pixel with a foreground pixel neighbor (8-connected) */
 void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
 
@@ -113,7 +162,7 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
 
           neighbor = ( (x+j) + (cols*(y+k)) );
 
-          if (i<200000 && mask[neighbor] == FOREGROUND) printf("i %ld, (%d, %d), j %ld, mask[j] %d\n", i, j, k, (neighbor), mask[neighbor]);
+          //if (i<200000 && mask[neighbor] == FOREGROUND) printf("i %ld, (%d, %d), j %ld, mask[j] %d\n", i, j, k, (neighbor), mask[neighbor]);
 
           if (mask[neighbor] == FOREGROUND) {
             grown[i] = FOREGROUND;
@@ -132,50 +181,6 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
   
 }
 
-/* turn off any foreground pixel with a background pixel neighbor (8-connected) */
-void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
-
-  long imagesize, i;
-  int x, y, j, k;
-
-  imagesize = (long)rows * (long)cols;
-
-  for (i=0; i < imagesize; ++i){
-
-    /* don't process the 1 pixel layer around the whole image */
-    if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) {
-      shrunk[i] = mask[i];
-    } 
-    /* ignore if background */
-    else if (mask[i] == BACKGROUND) {
-      shrunk[i] = mask[i];
-    }
-    /* if foreground with bg neighbors, turn off */
-    else if (mask[i] == FOREGROUND) {
-
-      x = i % cols;
-      y = i / cols;
-
-      for (j = -1; j <= 1; ++j) {
-        for(k = -1; k <= 1; ++k) {
-
-          /* grab pixel at ((x+j), (y+k)) */
-          if (mask[ (cols*(y+k)) + (x+j) ] == BACKGROUND) {
-            shrunk[i] = BACKGROUND;
-          }
-          else {
-            shrunk[i] = 128;
-          }
-        }
-      }
-    }  
-    
-    else {
-      shrunk[i] = mask[i];
-    }
-  }
-  
-}
 
 
 
