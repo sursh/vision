@@ -84,10 +84,14 @@ int main(int argc, char *argv[]) {
   return(0);
 }
 
-/* iterates through mask and outputs grown */
+
+
+/* turn off any foreground pixel with a background pixel neighbor (8-connected) */
+
+/* turn on any background pixel with a foreground pixel neighbor (8-connected) */
 void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
 
-  long imagesize, i;
+  long imagesize, i, neighbor;
   int x, y, j, k;
 
   imagesize = (long)rows * (long)cols;
@@ -110,13 +114,16 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
       /* look at 8 nearest neighbors. If foreground, make i foreground too */
       for (j = -1; j <= 1; ++j) {
         for(k = -1; k <= 1; ++k) {
-          /* grab pixel at ((x+j), (y+k)) */
-          if (i<2000) printf("i %ld, (%d, %d), j %d\n", i, j, k, ((cols*(y+k)) + (x+j)) );
-          if (mask[ (cols*(y+k)) + (x+j) ] == FOREGROUND) {
+
+          neighbor = ( (x+j) + (cols*(y+k)) );
+
+          if (i<200000 && mask[neighbor] == FOREGROUND) printf("i %ld, (%d, %d), j %ld, mask[j] %d\n", i, j, k, (neighbor), mask[neighbor]);
+
+          if (mask[neighbor] == FOREGROUND) {
             grown[i] = FOREGROUND;
           }
           else {
-            grown[i] = 128;
+            
           }
         }
       }
@@ -128,57 +135,6 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
   }
   
 }
-
-/* iterates through mask and outputs shrunk */
-void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
-
-  long imagesize, i;
-  int x, y, j, k;
-
-  imagesize = (long)rows * (long)cols;
-
-  for (i=0; i < imagesize; ++i){
-
-    /* don't process the 1 pixel layer around the whole image */
-    if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) {
-      shrunk[i] = mask[i];
-    } 
-    /* ignore if foreground */
-    else if (mask[i] == FOREGROUND) {
-      shrunk[i] = mask[i];
-    }
-    /* if background, apply shrinking algorithm */
-    else if (mask[i] == BACKGROUND) {
-      x = i % cols;
-      y = i / cols;
-
-      /* look at 8 nearest neighbors. If foreground, make i foreground too */
-      for (j = -1; j <= 1; ++j) {
-        for(k = -1; k <= 1; ++k) {
-          /* grab pixel at ((x+j), (y+k)) */
-          if (i<2000) printf("i %ld, (%d, %d), j %d\n", i, j, k, ((cols*(y+k)) + (x+j)) );
-          if (mask[ (cols*(y+k)) + (x+j) ] == FOREGROUND) {
-            shrunk[i] = FOREGROUND;
-          }
-          else {
-            shrunk[i] = 128;
-          }
-        }
-      }
-    }  
-    
-    else {
-      shrunk[i] = mask[i];
-    }
-  }
-  
-}
-
-
-
-
-
-
 
 
 
