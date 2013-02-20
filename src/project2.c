@@ -128,7 +128,6 @@ void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
     
     else {
       shrunk[i] = mask[i];
-      printf("%s\n", "fuck");
     }
   }
 }
@@ -161,8 +160,6 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
         for(k = -1; k <= 1; ++k) {
 
           neighbor = ( (x+j) + (cols*(y+k)) );
-
-          //if (i<200000 && mask[neighbor] == FOREGROUND) printf("i %ld, (%d, %d), j %ld, mask[j] %d\n", i, j, k, (neighbor), mask[neighbor]);
 
           if (mask[neighbor] == FOREGROUND) {
             grown[i] = FOREGROUND;
