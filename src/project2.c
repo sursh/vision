@@ -12,9 +12,10 @@
 #define USECPP 0
 #define intensities 255
 
-void grow(unsigned char *image, int rows, int cols);
+void grow(unsigned char *mask, unsigned char *newimage, int rows, int cols);
 
 int main(int argc, char *argv[]) {
+
   Pixel *image;
   int rows, cols, colors;
   long imagesize;
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]) {
   memcpy(grown, mask, imagesize);
 
   /* manipulate the images */
-  grow(grown, rows, cols);
+  grow(mask, grown, rows, cols);
 
   /* write out the files */
   writePGM(mask, rows, cols, intensities, maskfile);
@@ -76,14 +77,37 @@ int main(int argc, char *argv[]) {
   return(0);
 }
 
-void grow(unsigned char *image, int rows, int cols) {
+/* iterates through mask and outputs grown */
+void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
 
   long imagesize, i;
-  imagesize = (long)rows * (long)cols;
+  int x, y, j, k;
 
-  /* arbitrary image manipulation for testing */
+  imagesize = (long)rows * (long)cols;
+  
   for (i=0; i < imagesize; ++i){
-    if (image[i] == 255) image[i] = 128;
+    if (mask[i] == 0) grown[i] = 128;
   }
   
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
