@@ -14,6 +14,7 @@
 #define FOREGROUND 255
 #define BACKGROUND 0
 
+int edge(long i, int cols, long imagesize);
 void grow(unsigned char *mask, unsigned char *grown, int rows, int cols);
 void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols);
 void medianify(unsigned char *mask, unsigned char *median, int rows, int cols);
@@ -84,6 +85,12 @@ int main(int argc, char *argv[]) {
   return(0);
 }
 
+/* Ignore edge pixels. Return 1 if edge and 0 if not edge */
+int edge(long i, int cols, long imagesize) {
+  if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) return 1;
+  else return 0;
+}
+
 /* Median filter: pixel goes with a majority of neighboring pixel */
 void medianify(unsigned char *mask, unsigned char *median, int rows, int cols) {
 
@@ -95,9 +102,7 @@ void medianify(unsigned char *mask, unsigned char *median, int rows, int cols) {
   for (i=0; i < imagesize; ++i){ /* for each pixel */
 
     /* don't process the 1 pixel layer around the whole image */
-    if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) {
-      median[i] = mask[i];
-    } 
+    if (edge(i, cols, imagesize)) median[i] = mask[i]; 
     
     else {
 
@@ -140,9 +145,8 @@ void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
   for (i=0; i < imagesize; ++i){
 
     /* don't process the 1 pixel layer around the whole image */
-    if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) {
-      shrunk[i] = mask[i];
-    } 
+    if (edge(i, cols, imagesize)) shrunk[i] = mask[i]; 
+
     /* ignore if background */
     else if (mask[i] == BACKGROUND) {
       shrunk[i] = 0;
@@ -188,9 +192,8 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
   for (i=0; i < imagesize; ++i){
 
     /* don't process the 1 pixel layer around the whole image */
-    if ((i < (cols)) || i > (imagesize - cols) || (i % cols) == 0 || (i % cols) == (cols-1)) {
-      grown[i] = mask[i];
-    } 
+    if (edge(i, cols, imagesize)) grown[i] = mask[i]; 
+
     /* ignore if foreground */
     else if (mask[i] == FOREGROUND) {
       grown[i] = mask[i];
