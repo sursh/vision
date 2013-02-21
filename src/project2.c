@@ -94,10 +94,12 @@ int edge(long i, int cols, long imagesize) {
 /* Median filter: pixel goes with a majority of neighboring pixel */
 void medianify(unsigned char *mask, unsigned char *median, int rows, int cols) {
 
-  long imagesize, i, neighbor;
-  int x, y, j, k, total;
+  long imagesize, i;
+  int j, total;
+  int *offsets;
 
-  imagesize = (long)rows * (long)cols;
+  imagesize = rows * cols;
+  offsets = getOffsets(cols, imagesize);
 
   for (i=0; i < imagesize; ++i){ /* for each pixel */
 
@@ -106,27 +108,19 @@ void medianify(unsigned char *mask, unsigned char *median, int rows, int cols) {
     
     else {
 
-      x = i % cols;
-      y = i / cols;
-
       total = 0;
 
-      /* look at 8 nearest neighbors. Average wins, i is tiebreaker */
-      for (j = -1; j <= 1; ++j) {
-        for (k = -1; k <= 1; ++k) {
-
-          neighbor = ( (x+j) + (cols*(y+k)) );
-
-          if (mask[neighbor] == FOREGROUND) {
-            ++total;
-          }
-          
+      /* count number of foreground pixels in i and neighbors, set i to majority */
+      for (j = 0; j < 9; ++j) {
+        if ( mask[offsets[j] + i] == FOREGROUND) {
+          ++total;
         }
       }
 
       if (total > 4) {
         median[i] = FOREGROUND;
       }
+      
       else {
         median[i] = BACKGROUND;
       }
