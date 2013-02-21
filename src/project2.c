@@ -9,7 +9,6 @@
 #include "ppmIO.h"
 #include "vision.h"
 
-#define USECPP 0
 #define INTENSITIES 255
 #define FOREGROUND 255
 #define BACKGROUND 0
@@ -18,6 +17,7 @@ int edge(long i, int cols, long imagesize);
 void grow(unsigned char *mask, unsigned char *grown, int rows, int cols);
 void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols);
 void medianify(unsigned char *mask, unsigned char *median, int rows, int cols);
+int *getOffsets(int cols, long imagesize);
 
 int main(int argc, char *argv[]) {
 
@@ -181,40 +181,53 @@ void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
   }
 }
 
+/* outputs the values of pixel mask[i] as well as the 8 nearest neighbors into array neighbors[] */
+int *getOffsets(int cols, long imagesize) {
+
+  int position;
+  int *neighborOffsets;
+
+  neighborOffsets = (int *) malloc(9 * sizeof(int));
+
+  neighborOffsets[0] = -cols-1;
+  neighborOffsets[1] = -cols;
+  neighborOffsets[2] = -cols+1;
+  neighborOffsets[3] = -1;
+  neighborOffsets[4] = 0;
+  neighborOffsets[5] = 1;
+  neighborOffsets[6] = cols-1;
+  neighborOffsets[7] = cols;
+  neighborOffsets[8] = cols+1;
+  
+  return neighborOffsets;
+}
+
 /* turn on any background pixel with a foreground pixel neighbor (8-connected) */
 void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
 
-  long imagesize, i, neighbor;
-  int x, y, j, k;
+  long imagesize, i;
+  int j;
+  int *offsets;
 
-  imagesize = (long)rows * (long)cols;
+  imagesize = rows * cols;
+  offsets = getOffsets(cols, imagesize); /* this won't work because neighbors is in tho wrong scope */
 
-  for (i=0; i < imagesize; ++i){
+  for (i=0; i < imagesize; ++i) {
 
     /* don't process the 1 pixel layer around the whole image */
     if (edge(i, cols, imagesize)) grown[i] = mask[i]; 
 
     /* ignore if foreground */
-    else if (mask[i] == FOREGROUND) {
-      grown[i] = mask[i];
-    }
-    /* if background, apply growing algorithm */
+    else if (mask[i] == FOREGROUND) grown[i] = mask[i];
+
+    /* examine background pixels */
     else if (mask[i] == BACKGROUND) {
-      x = i % cols;
-      y = i / cols;
 
-      /* look at 8 nearest neighbors. If any are foreground, turn pixel on */
-      for (j = -1; j <= 1; ++j) {
-        for (k = -1; k <= 1; ++k) {
-
-          neighbor = ( (x+j) + (cols*(y+k)) );
-
-          if (mask[neighbor] == FOREGROUND) {
-            grown[i] = FOREGROUND;
-          }
-          else {
-            
-          }
+      /* look at 8 nearest neighbors. If ANY are foreground, turn pixel ON */
+      for (j = 0; j < 9; ++j) {
+        if (mask[ i + offsets[j] ] == FOREGROUND) {
+          grown[i] = FOREGROUND;
+          break;
         }
       }
     }  
