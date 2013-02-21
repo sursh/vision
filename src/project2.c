@@ -137,10 +137,12 @@ void medianify(unsigned char *mask, unsigned char *median, int rows, int cols) {
 /* turn off any foreground pixel with a background pixel neighbor (8-connected) */
 void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
 
-  long imagesize, i, neighbor;
-  int x, y, j, k;
+  long imagesize, i;
+  int j;
+  int *offsets;
 
-  imagesize = (long)rows * (long)cols;
+  imagesize = rows * cols;
+  offsets = getOffsets(cols, imagesize);
 
   for (i=0; i < imagesize; ++i){
 
@@ -149,31 +151,21 @@ void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
 
     /* ignore if background */
     else if (mask[i] == BACKGROUND) {
-      shrunk[i] = 0;
+      shrunk[i] = BACKGROUND;
     }
     /* if foreground, apply shrinking algorithm */
     else if (mask[i] == FOREGROUND) {
-      x = i % cols;
-      y = i / cols;
 
-      /* look at 8 nearest neighbors. If any are background, turn pixel off */
-      for (j = -1; (j <= 1) && (shrunk[i] != FOREGROUND); ++j) {
-        for (k = -1; k <= 1; ++k) {
+      shrunk[i] = FOREGROUND;
 
-          neighbor = ( (x+j) + (cols*(y+k)) );
-
-          if (mask[neighbor] == BACKGROUND) {
-            shrunk[i] = BACKGROUND;
-            break; /* out of first loop */
-          }
-          else {
-            shrunk[i] = FOREGROUND;
-          }
-          
+      /* look at 8 nearest neighbors. If ANY are foreground, turn pixel ON */
+      for (j = 0; j < 9; ++j) {
+        if( mask[ i + offsets[j]] == BACKGROUND){
+          shrunk[i] = BACKGROUND;
+          break;
         }
       }
-    }  
-    
+    }
     else {
       printf("Error: Hit a value that's not 0 or 255!\n");
       shrunk[i] = mask[i];
@@ -184,7 +176,6 @@ void shrink(unsigned char *mask, unsigned char *shrunk, int rows, int cols) {
 /* outputs the values of pixel mask[i] as well as the 8 nearest neighbors into array neighbors[] */
 int *getOffsets(int cols, long imagesize) {
 
-  int position;
   int *neighborOffsets;
 
   neighborOffsets = (int *) malloc(9 * sizeof(int));
@@ -210,7 +201,7 @@ void grow(unsigned char *mask, unsigned char *grown, int rows, int cols) {
   int *offsets;
 
   imagesize = rows * cols;
-  offsets = getOffsets(cols, imagesize); /* this won't work because neighbors is in tho wrong scope */
+  offsets = getOffsets(cols, imagesize);
 
   for (i=0; i < imagesize; ++i) {
 
